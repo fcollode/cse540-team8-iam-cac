@@ -2,20 +2,44 @@
 
 pragma solidity >=0.8.2 <0.9.0;
 
-contract didRegistry {
+contract didRegistryContract {
+
+    struct didDocument {
+
+        // Decentralized Identifier (DID) v1.0 specification at https://www.w3.org/TR/did-core/
+        // DID key method specification at https://w3c-ccg.github.io/did-key-spec
+        // Ex. of valid Ed25519 did:key value: did:key:z6MkhaXgBZDvotDkL5257faiztiGiC2QtKLGpbnnEGta2doK
+        string id;
+        string controller;
+
+        // IPFS Content Identifier (CID) for full credential blob
+        // Ex.: ipfs://QmPK1s3pNYLi9ERiq3BDxKa4XosgWwFRQUydHUtz4YgpqB
+        string serviceEndpoint;
+        bool isValid;
+    }
     
-    mapping(address => string) private didDocumentIpfsHash;
-    mapping(address => bool) private isValidUser;
+    mapping(string => didDocument) private didRegistry;
 
-    function createDid(string memory ipfsHash) public {
+    function addDidToRegistry(string memory holderDidKey) public {
 
-        didDocumentIpfsHash[tx.origin] = ipfsHash;
-        isValidUser[tx.origin] = true;
+        require(bytes(didRegistry[holderDidKey].id).length == 0, "ERROR: did:key already exists");
+
+        didRegistry[holderDidKey] = didDocument({
+            id: holderDidKey,
+            controller: holderDidKey,
+            serviceEndpoint: "ipfs://",
+            isValid: true
+        });
 
     }
 
-    function retrieveStatus() public view returns (bool) {
-        return isValidUser[tx.origin];
+    function revokeDid (string memory holderDidKey) public {
+
+        require(bytes(didRegistry[holderDidKey].id).length != 0, "ERROR: did:key does not exist");
+        require(didRegistry[holderDidKey].isValid == true, "ERROR: did:key has already been revoked");
+
+        didRegistry[holderDidKey].isValid = false;
+    
     }
 
 }
