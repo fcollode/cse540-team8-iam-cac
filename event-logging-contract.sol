@@ -7,7 +7,7 @@ contract eventLoggingContract {
     struct logEntry {
         string holderDidKey;
         string action;
-        // both verifier and timestamp are injected by EVM
+        // both verifier and timestamp assigned by global values provided by EVM
         address verifier;
         uint256 timestamp;
     }
