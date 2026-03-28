@@ -30,8 +30,17 @@ Instructions for use are currently primarily illustrated using user stories. The
 When a new employee is onboarded, the should be able to generate and register a new Decentralized Identity (DID) on-chain and then store that DID in their personal wallet. 
 
 ``` solidity
-function registerDid() public {
-  // 
+function addDidToRegistry(string memory holderDidKey) public {
+
+  require(bytes(didRegistry[holderDidKey].id).length == 0, "ERROR: did:key already exists");
+
+  didRegistry[holderDidKey] = DidDocument({
+    id: holderDidKey,
+    controller: holderDidKey,
+    serviceEndpoint: "ipfs://",
+    isValid: true
+  });
+
 }
 ```
 
@@ -61,8 +70,13 @@ function removeRole() public {
 When an employee logs into an internal application, the client should send the user's DID and Verifiable Credentials to be verified by the IAM-CAC blockchain.
 
 ``` solidity
-function verifyVC() public {
-  // 
+function isCredentialValid(string memory issuerDidKey, uint256 credentialIndex) public view returns (bool) {
+
+  require(credentialIndex < 256, "ERROR: Credential index out of range");
+  require(validateCredentialStatusRegistry(issuerDidKey));
+
+  return (credentialStatusRegistry[issuerDidKey].bitmaskStatus & (1 << credentialIndex)) == 0;
+
 }
 ```
 
@@ -70,8 +84,13 @@ function verifyVC() public {
 In case of security incidents, or during employee offboarding, a user with the `admin` role should be able to revoke another user's Verifiable Credentials, immediately removing their access to internal applications. 
 
 ``` solidity
-function revokeVC() public {
-  // 
+function revokeCredential(string memory issuerDidKey, uint256 credentialIndex) public {
+
+  require(credentialIndex < 256, "ERROR: Credential index out of range");
+  require(validateCredentialStatusRegistry(issuerDidKey));
+
+  credentialStatusRegistry[issuerDidKey].bitmaskStatus |= (1 << credentialIndex);
+    
 }
 ```
 
@@ -79,7 +98,12 @@ function revokeVC() public {
 During the employee offboarding process, a user with the `admin` role should be able to delete another employee's DID from the DidRegistry. 
 
 ``` solidity
-function deleteDid() public {
-  // 
+function revokeDid (string memory holderDidKey) public {
+
+  require(bytes(didRegistry[holderDidKey].id).length != 0, "ERROR: did:key does not exist");
+  require(didRegistry[holderDidKey].isValid == true, "ERROR: did:key has already been revoked");
+
+  didRegistry[holderDidKey].isValid = false;
+    
 }
 ```
