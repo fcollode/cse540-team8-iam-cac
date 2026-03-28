@@ -49,6 +49,9 @@ contract DidRegistryContract {
         string[] groups; // Contractors get permissions from groups
     }
 
+    event DidAdded(string holderDidKey, address caller, uint256 timestamp);
+    event DidRevoked(string holderDidKey, address caller, uint256 timestamp);
+
     function addDidToRegistry(string memory holderDidKey) public {
 
         require(bytes(didRegistry[holderDidKey].id).length == 0, "ERROR: did:key already exists");
@@ -60,6 +63,8 @@ contract DidRegistryContract {
             isValid: true
         });
 
+        emit DidAdded(holderDidKey, msg.sender, block.timestamp);
+
     }
 
     function revokeDid (string memory holderDidKey) public {
@@ -68,7 +73,9 @@ contract DidRegistryContract {
         require(didRegistry[holderDidKey].isValid == true, "ERROR: did:key has already been revoked");
 
         didRegistry[holderDidKey].isValid = false;
-    
+
+        emit DidRevoked(holderDidKey, msg.sender, block.timestamp);
+
     }
 
 }
