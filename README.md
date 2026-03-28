@@ -24,7 +24,62 @@ Currently the setup of this project involves deploying the contracts and then se
 The passed address must match the deployed address of the other contract(s) specified in the `connectContracts` function of the appropriate contract.
 
 ## Instructions and User Stories
-Instructions for use are currently primarily illustrated using user stories.
-These stories represent how we intend for the end users and administrators of this system to be able to interact with the IAM system.
-Currently, any operations that involve bridging between IPFS and the on-chain Ethereum contract must be conducted manually.
+Instructions for use are currently primarily illustrated using user stories. These stories represent how we intend for the end users and administrators of this system to be able to interact with the IAM system. Currently, any operations that involve bridging between IPFS and the on-chain Ethereum contract must be conducted manually.
 
+### 1. A new employee should be able to register a Decentralized Identity (DID). 
+When a new employee is onboarded, the should be able to generate and register a new Decentralized Identity (DID) on-chain and then store that DID in their personal wallet. 
+
+``` solidity
+function registerDid() public {
+  // 
+}
+```
+
+### 2. An employee should be able to gernate Verifiable Credentials.
+An employee should be able to generate Verifiable Credentials on the blockchain.
+
+``` solidity
+function issueVC() public {
+  // 
+}
+```
+
+### 3. An admin should be able to update an employee's permissions. 
+An user with the `admin` role should be able to update another employee's permissions by either updating the employee's roles or groups. These permissions should correspond to the internal applications that an employee is able to access. 
+
+``` solidity
+function addRole() public {
+  // 
+}
+
+function removeRole() public {
+  // 
+}
+```
+
+### 4. An employee with proper access should be able to login to an internal system. 
+When an employee logs into an internal application, the client should send the user's DID and Verifiable Credentials to be verified by the IAM-CAC blockchain.
+
+``` solidity
+function verifyVC() public {
+  // 
+}
+```
+
+### 5. An admin only should be able to revoke an employee's Verifiable Credentials.
+In case of security incidents, or during employee offboarding, a user with the `admin` role should be able to revoke another user's Verifiable Credentials, immediately removing their access to internal applications. 
+
+``` solidity
+function revokeVC() public {
+  // 
+}
+```
+
+### 6. An admin only should be able to delete an employee's Decentralized Identity.
+During the employee offboarding process, a user with the `admin` role should be able to delete another employee's DID from the DidRegistry. 
+
+``` solidity
+function deleteDid() public {
+  // 
+}
+```
