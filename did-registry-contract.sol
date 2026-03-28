@@ -2,9 +2,9 @@
 
 pragma solidity >=0.8.2 <0.9.0;
 
-contract didRegistryContract {
+contract DidRegistryContract {
 
-    struct didDocument {
+    struct DidDocument {
 
         // Decentralized Identifier (DID) v1.0 specification at https://www.w3.org/TR/did-core/
         // DID key method specification at https://w3c-ccg.github.io/did-key-spec
@@ -18,13 +18,42 @@ contract didRegistryContract {
         bool isValid;
     }
     
-    mapping(string => didDocument) private didRegistry;
+    mapping(string => DidDocument) private didRegistry;
+    enum EmployeeStatus { FULL_TIME, PART_TIME, CONTRACTOR }
+
+    struct Identity {
+        DidDocument didDocument;
+        string ipfsHash;
+        bool isValid;
+        string name;
+        string email;
+    }
+
+    struct EmploymentDetails {
+        uint employeeId;
+        EmployeeStatus employeeStatus;
+        uint startDate;
+        uint endDate;
+    }
+
+    struct Employee {
+        Identity identity;
+        EmploymentDetails employmentDetails;
+        string[] roles; // Employees get permissions from roles
+    }
+
+    struct Contractor {
+        Identity identity;
+        EmploymentDetails employmentDetails;
+        string agency;
+        string[] groups; // Contractors get permissions from groups
+    }
 
     function addDidToRegistry(string memory holderDidKey) public {
 
         require(bytes(didRegistry[holderDidKey].id).length == 0, "ERROR: did:key already exists");
 
-        didRegistry[holderDidKey] = didDocument({
+        didRegistry[holderDidKey] = DidDocument({
             id: holderDidKey,
             controller: holderDidKey,
             serviceEndpoint: "ipfs://",
