@@ -29,6 +29,7 @@ Instructions for use are currently primarily illustrated using user stories. The
 ### 1. A new employee should be able to register a Decentralized Identity (DID). 
 When a new employee is onboarded, the should be able to generate and register a new Decentralized Identity (DID) on-chain and then store that DID in their personal wallet. 
 
+#### Handler
 ``` solidity
 function addDidToRegistry(string memory holderDidKey) public {
 
@@ -47,6 +48,7 @@ function addDidToRegistry(string memory holderDidKey) public {
 ### 2. An employee should be able to gernate Verifiable Credentials.
 An employee should be able to generate Verifiable Credentials on the blockchain.
 
+#### Handler
 ``` solidity
 function issueVC() public {
   // 
@@ -56,6 +58,7 @@ function issueVC() public {
 ### 3. An admin should be able to update an employee's permissions. 
 An user with the `admin` role should be able to update another employee's permissions by either updating the employee's roles or groups. These permissions should correspond to the internal applications that an employee is able to access. 
 
+#### Handler
 ``` solidity
 function addRole() public {
   // 
@@ -69,6 +72,7 @@ function removeRole() public {
 ### 4. An employee with proper access should be able to login to an internal system. 
 When an employee logs into an internal application, the client should send the user's DID and Verifiable Credentials to be verified by the IAM-CAC blockchain.
 
+#### Handler
 ``` solidity
 function isCredentialValid(string memory issuerDidKey, uint256 credentialIndex) public view returns (bool) {
 
@@ -83,6 +87,7 @@ function isCredentialValid(string memory issuerDidKey, uint256 credentialIndex) 
 ### 5. An admin only should be able to revoke an employee's Verifiable Credentials.
 In case of security incidents, or during employee offboarding, a user with the `admin` role should be able to revoke another user's Verifiable Credentials, immediately removing their access to internal applications. 
 
+#### Handler
 ``` solidity
 function revokeCredential(string memory issuerDidKey, uint256 credentialIndex) public {
 
@@ -97,6 +102,7 @@ function revokeCredential(string memory issuerDidKey, uint256 credentialIndex) p
 ### 6. An admin only should be able to delete an employee's Decentralized Identity.
 During the employee offboarding process, a user with the `admin` role should be able to delete another employee's DID from the DidRegistry. 
 
+#### Handler
 ``` solidity
 function revokeDid (string memory holderDidKey) public {
 
