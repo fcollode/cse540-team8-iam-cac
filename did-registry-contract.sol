@@ -18,6 +18,9 @@ contract DidRegistryContract {
         bool isValid;
     }
     
+    // users must upload their wallet's public key to be able to use the contract.  
+    mapping(address => string) public publicKey;
+    // mapping of public keys to DID documents on 
     mapping(string => DidDocument) private didRegistry;
     enum EmployeeStatus { FULL_TIME, PART_TIME, CONTRACTOR }
 
@@ -49,7 +52,39 @@ contract DidRegistryContract {
         string[] groups; // Contractors get permissions from groups
     }
 
-    function addDidToRegistry(string memory holderDidKey) public {
+    modifier checkPublicKey(bytes32 signedHash) {
+        require(bytes(publicKey[msg.sender]).length != 0);
+        string memory senderPublicKey = publicKey[msg.sender];
+        bytes32 r;
+        bytes32 s;
+        uint8 v;
+        assembly ("memory-safe") {
+            r := mload(add(senderPublicKey, 0x20))
+            s := mload(add(senderPublicKey, 0x40))
+            v := byte(0, mload(add(senderPublicKey, 0x60)))
+        }
+        if (msg.sender != ecrecover(signedHash, v, r, s)) revert();
+        _;
+    }
+
+    // verifies that a passed public key is in fact the key that corresponds to the wallet that passed it
+    // if the verification is successful, the public key is stored to the public key mapping
+    // TODO: cannot test this yet since Remix doesn't have a way to get a public or even private key of a test wallet out that I can see
+    function verifyPublicKey(string memory toVerifyKey, bytes32 hashOfKey) public {
+        require(bytes(publicKey[msg.sender]).length == 0, "ERROR: public key has already been proven for this wallet");
+        bytes32 r;
+        bytes32 s;
+        uint8 v;
+        assembly ("memory-safe") {
+            r := mload(add(toVerifyKey, 0x20))
+            s := mload(add(toVerifyKey, 0x40))
+            v := byte(0, mload(add(toVerifyKey, 0x60)))
+        }
+        if (msg.sender != ecrecover(hashOfKey, v, r, s)) revert();
+        publicKey[msg.sender] = toVerifyKey;
+    }
+
+    function addDidToRegistry(string memory holderDidKey, bytes32 signedDidHash) public checkPublicKey(signedDidHash) {
 
         require(bytes(didRegistry[holderDidKey].id).length == 0, "ERROR: did:key already exists");
 
