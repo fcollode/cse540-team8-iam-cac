@@ -18,10 +18,13 @@ The current dependencies are:
 2. An IPFS node running on the development machine. See [IPFS documentation](https://docs.ipfs.tech/install/ipfs-desktop/) The node must remain up for the duration of using the IAM system, as it cannot otherwise be guaranteed that the VC files will be available for download.
 
 ### Setup
-Currently the setup of this project involves deploying the contracts and then setting up their pointers to other contracts, in order to utilize their other fuctionality.
-1. Deploy each contract from this repository.
-2. Because these contracts are dependent on each other's functionality, they must then be linked to each other using the `connectContracts` function of each contract by the initial wallet that deployed the contracts.
-The passed address must match the deployed address of the other contract(s) specified in the `connectContracts` function of the appropriate contract.
+Currently the setup of this project involves deploying the contracts on a test environment.
+1. Using [Remix IDE](https://remix.live/), clone this repository.
+2. Compile smart contract 'credential-status-contract.sol' and 'did-registry-contract.sol' in the File Explorer.
+3. In the Deploy & Run Transactions section, deploy both compiled contracts using a Remix VM environment.
+4. Interact with the different contract functions by passing arguments to the functions and observe interaction with the VM blockchain on the right side.
+5. Observe the contract functions reject invalid inputs or scenarios, while successfully processing valid arguments according to the current state.
+
 
 ## Instructions and User Stories
 Instructions for use are currently primarily illustrated using user stories. These stories represent how we intend for the end users and administrators of this system to be able to interact with the IAM system. Currently, any operations that involve bridging between IPFS and the on-chain Ethereum contract must be conducted manually.
