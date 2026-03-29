@@ -152,7 +152,7 @@ contract DidRegistryContract {
 
     }
 
-    function updateName(uint employeeId, string memory _name) public {
+    function updateEmployeeName(uint employeeId, string memory _name) public {
 
         require(bytes(employeeRegistry[employeeId].identity.name).length != 0, "ERROR: Employee does not exist");
 
@@ -160,7 +160,7 @@ contract DidRegistryContract {
 
     }
 
-    function updateEmail(uint employeeId, string memory _email) public {
+    function updateEmployeeEmail(uint employeeId, string memory _email) public {
 
         require(bytes(employeeRegistry[employeeId].identity.name).length != 0, "ERROR: Employee does not exist");
 
@@ -168,7 +168,7 @@ contract DidRegistryContract {
 
     }
 
-    function updateIpfsCid(uint employeeId, string memory _ipfsCid) public {
+    function updateEmployeeIpfsCid(uint employeeId, string memory _ipfsCid) public {
 
         require(bytes(employeeRegistry[employeeId].identity.name).length != 0, "ERROR: Employee does not exist");
 
@@ -219,5 +219,10 @@ contract DidRegistryContract {
         contractorRegistry[employeeId].employmentDetails.endDate = _endDate;
 
     }
+
+    function updateContractorName(uint employeeId, string memory _name) public {}
+    function updateContractorEmail(uint employeeId, string memory _email) public {}
+    function updateContractorIpfsCid(uint employeeId, string memory _ipfsCid) public {}
+    function updateContractorAgency(uint employeeId, string memory _ipfsCid) public {}
 
 }
