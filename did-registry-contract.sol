@@ -86,6 +86,24 @@ contract DidRegistryContract {
     }
 
 
+    // DID events
+    event DidAdded(uint employeeId, string holderDidKey, address caller, uint256 timestamp);
+    event DidRevoked(uint employeeId, address caller, uint256 timestamp);
+    event DidUpdated(uint employeeId, string holderNewDidKey, address caller, uint256 timestamp);
+
+    // Employee events
+    event EmployeeAdded(uint employeeId, string name, address caller, uint256 timestamp);
+    event EmployeeRevoked(uint employeeId, address caller, uint256 timestamp);
+    event EmployeeNameUpdated(uint employeeId, string name, address caller, uint256 timestamp);
+    event EmployeeEmailUpdated(uint employeeId, string email, address caller, uint256 timestamp);
+    event EmployeeIpfsCidUpdated(uint employeeId, string ipfsCid, address caller, uint256 timestamp);
+    event EmployeeStatusUpdated(uint employeeId, EmployeeStatus employeeStatus, address caller, uint256 timestamp);
+
+    // Contractor events
+    event ContractorAdded(uint employeeId, string name, address caller, uint256 timestamp);
+    event ContractorRevoked(uint employeeId, address caller, uint256 timestamp);
+
+
     /*
     DID Registry Functions
     */
@@ -98,6 +116,8 @@ contract DidRegistryContract {
             isValid: true
         });
 
+        emit DidAdded(employeeId, holderDidKey, msg.sender, block.timestamp);
+
     }
 
     function revokeDidKey(uint employeeId) public {
@@ -106,7 +126,9 @@ contract DidRegistryContract {
         require(didRegistry[employeeId].isValid == true, "ERROR: did:key has already been revoked");
 
         didRegistry[employeeId].isValid = false;
-    
+
+        emit DidRevoked(employeeId, msg.sender, block.timestamp);
+
     }
 
     function updateDidKey(uint employeeId, string memory holderNewDidKey) public {
@@ -115,6 +137,8 @@ contract DidRegistryContract {
 
         didRegistry[employeeId].didKey = holderNewDidKey;
         didRegistry[employeeId].isValid = true;
+
+        emit DidUpdated(employeeId, holderNewDidKey, msg.sender, block.timestamp);
 
     }
 
@@ -141,6 +165,8 @@ contract DidRegistryContract {
         });
         employeeRegistry[employeeId].roles[0] = "READ_ONLY";
 
+        emit EmployeeAdded(employeeId, _name, msg.sender, block.timestamp);
+
     }
 
     function revokeEmployee(uint employeeId, uint _endDate) public {
@@ -150,6 +176,8 @@ contract DidRegistryContract {
         employeeRegistry[employeeId].identity.isValid = false;
         employeeRegistry[employeeId].employmentDetails.endDate = _endDate;
 
+        emit EmployeeRevoked(employeeId, msg.sender, block.timestamp);
+
     }
 
     function updateEmployeeName(uint employeeId, string memory _name) public {
@@ -157,6 +185,8 @@ contract DidRegistryContract {
         require(bytes(employeeRegistry[employeeId].identity.name).length != 0, "ERROR: Employee does not exist");
 
         employeeRegistry[employeeId].identity.name = _name;
+
+        emit EmployeeNameUpdated(employeeId, _name, msg.sender, block.timestamp);
 
     }
 
@@ -166,6 +196,8 @@ contract DidRegistryContract {
 
         employeeRegistry[employeeId].identity.email = _email;
 
+        emit EmployeeEmailUpdated(employeeId, _email, msg.sender, block.timestamp);
+
     }
 
     function updateEmployeeIpfsCid(uint employeeId, string memory _ipfsCid) public {
@@ -174,6 +206,8 @@ contract DidRegistryContract {
 
         employeeRegistry[employeeId].identity.ipfsCid = _ipfsCid;
 
+        emit EmployeeIpfsCidUpdated(employeeId, _ipfsCid, msg.sender, block.timestamp);
+
     }
 
     function updateEmployeeStatus(uint employeeId, EmployeeStatus _employeeStatus) public {
@@ -181,6 +215,8 @@ contract DidRegistryContract {
         require(bytes(employeeRegistry[employeeId].identity.name).length != 0, "ERROR: Employee does not exist");
 
         employeeRegistry[employeeId].employmentDetails.employeeStatus = _employeeStatus;
+
+        emit EmployeeStatusUpdated(employeeId, _employeeStatus, msg.sender, block.timestamp);
 
     }
 
@@ -212,6 +248,8 @@ contract DidRegistryContract {
         contractorRegistry[employeeId].agency = _agency;
         contractorRegistry[employeeId].groups[0] = "GROUP_0";
 
+        emit ContractorAdded(employeeId, _name, msg.sender, block.timestamp);
+
     }
 
     function revokeContractor(uint employeeId, uint _endDate) public {
@@ -220,6 +258,8 @@ contract DidRegistryContract {
 
         contractorRegistry[employeeId].identity.isValid = false;
         contractorRegistry[employeeId].employmentDetails.endDate = _endDate;
+
+        emit ContractorRevoked(employeeId, msg.sender, block.timestamp);
 
     }
 

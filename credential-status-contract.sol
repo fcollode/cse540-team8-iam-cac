@@ -14,6 +14,11 @@ contract credentialStatusContract {
 
     mapping(string => credentialStatus) private credentialStatusRegistry;
 
+    event CredentialStatusRegistryCreated(string issuerDidKey, address caller, uint256 timestamp);
+    event CredentialStatusRegistryRevoked(string issuerDidKey, address caller, uint256 timestamp);
+    event CredentialEnabled(string issuerDidKey, uint256 credentialIndex, address caller, uint256 timestamp);
+    event CredentialRevoked(string issuerDidKey, uint256 credentialIndex, address caller, uint256 timestamp);
+
     function createCredentialStatusRegistry(string memory issuerDidKey) public {
 
         // Creates a credential status registry for each Issuer
@@ -25,6 +30,8 @@ contract credentialStatusContract {
             bitmaskStatus: 0,
             isValid: true
         });
+
+        emit CredentialStatusRegistryCreated(issuerDidKey, msg.sender, block.timestamp);
 
     }
 
@@ -42,7 +49,9 @@ contract credentialStatusContract {
         require(validateCredentialStatusRegistry(issuerDidKey));
 
         credentialStatusRegistry[issuerDidKey].isValid = false;
-    
+
+        emit CredentialStatusRegistryRevoked(issuerDidKey, msg.sender, block.timestamp);
+
     }
 
 
@@ -59,7 +68,9 @@ contract credentialStatusContract {
 
         // AND NOT bitwise operation sets credential status bit to 0 (Valid)
         credentialStatusRegistry[issuerDidKey].bitmaskStatus &= ~(1 << credentialIndex);
-    
+
+        emit CredentialEnabled(issuerDidKey, credentialIndex, msg.sender, block.timestamp);
+
     }
 
     function revokeCredential(string memory issuerDidKey, uint256 credentialIndex) public {
@@ -69,7 +80,9 @@ contract credentialStatusContract {
 
         // OR bitwise operation sets credential status bit to 1 (Revoked)
         credentialStatusRegistry[issuerDidKey].bitmaskStatus |= (1 << credentialIndex);
-    
+
+        emit CredentialRevoked(issuerDidKey, credentialIndex, msg.sender, block.timestamp);
+
     }
 
     function isCredentialValid(string memory issuerDidKey, uint256 credentialIndex) public view returns (bool) {
