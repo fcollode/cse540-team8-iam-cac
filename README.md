@@ -142,7 +142,7 @@ During contractor offboarding, a user with the `admin` role should be able to re
 function revokeContractor(uint employeeId, uint _endDate) public {}
 ```
 
-### 12. An admin only should be able to revoke an employee's Decentralized Identity.
+### 13. An admin only should be able to revoke an employee's Decentralized Identity.
 During the employee offboarding process, a user with the `admin` role should be able to revoke another employee's DID from the DidRegistry. 
 
 #### Handler
