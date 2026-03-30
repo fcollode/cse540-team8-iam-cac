@@ -184,6 +184,9 @@ contract DidRegistryContract {
 
     }
 
+    function addRole(uint employeeId, string memory _role) public {}
+    function removeRole(uint employeeId, string memory _role) public {}
+
 
     /*
     Contractor Registry functions
