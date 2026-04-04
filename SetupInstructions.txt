@@ -1,0 +1,35 @@
+==== [Terminal 1]
+1. Foundry & Anvil install and launch
+$ curl -L https://foundry.paradigm.xyz | bash
+$ source ~/.bashrc
+$ foundryup
+$ anvil
+
+==== [Terminal 2]
+1. Compile
+$ mkdir cse540-team8-iam-cac
+$ cd cse540-team8-iam-cac
+/cse540-team8-iam-cac$ forge init --no-git
+/cse540-team8-iam-cac$ rm script/Counter.s.sol
+/cse540-team8-iam-cac$ rm test/Counter.t.sol
+/cse540-team8-iam-cac$ cd src/
+
+2. SFTP/Clone did-registry-contract.sol and credential-status-contract.sol to src/
+
+3. Build and deploy
+/src$ forge build
+/src$ forge create did-registry-contract.sol:DidRegistryContract \
+--rpc-url http://127.0.0.1:8545 \
+--private-key 0xac0974bec39a17e36ba4a6b4d238ff944bacb478cbed5efcae784d7bf4f2ff80 --broadcast
+
+
+==== [Terminal 3]
+1. Web3 Python library installation
+$ python3 -m venv venv
+$ source venv/bin/activate
+(venv) $ pip3 install web3
+(venv) $ pip3 install cryptography
+(venv) $ pip3 install base58
+
+2. Run tests
+(venv) $ python3 iam-cac.py
