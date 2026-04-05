@@ -2,9 +2,9 @@
 
 pragma solidity >=0.8.2 <0.9.0;
 
-contract credentialStatusContract {
+contract CredentialStatusContract {
 
-    struct credentialStatus {
+    struct CredentialStatus {
 
         string issuer;
         uint256 bitmaskStatus;
@@ -12,7 +12,7 @@ contract credentialStatusContract {
 
     }
 
-    mapping(string => credentialStatus) private credentialStatusRegistry;
+    mapping(string => CredentialStatus) private credentialStatusRegistry;
 
     event CredentialStatusRegistryCreated(string issuerDidKey, address caller, uint256 timestamp);
     event CredentialStatusRegistryRevoked(string issuerDidKey, address caller, uint256 timestamp);
@@ -25,7 +25,7 @@ contract credentialStatusContract {
 
         require(bytes(credentialStatusRegistry[issuerDidKey].issuer).length == 0, "ERROR: Credential status registry already exists for this Issuer");
 
-        credentialStatusRegistry[issuerDidKey] = credentialStatus({
+        credentialStatusRegistry[issuerDidKey] = CredentialStatus({
             issuer: issuerDidKey,
             bitmaskStatus: 0,
             isValid: true
@@ -47,9 +47,7 @@ contract credentialStatusContract {
     function revokeCredentialStatusRegistry(string memory issuerDidKey) public {
 
         require(validateCredentialStatusRegistry(issuerDidKey));
-
         credentialStatusRegistry[issuerDidKey].isValid = false;
-
         emit CredentialStatusRegistryRevoked(issuerDidKey, msg.sender, block.timestamp);
 
     }
@@ -67,7 +65,7 @@ contract credentialStatusContract {
         require(validateCredentialStatusRegistry(issuerDidKey));
 
         // AND NOT bitwise operation sets credential status bit to 0 (Valid)
-        credentialStatusRegistry[issuerDidKey].bitmaskStatus &= ~(1 << credentialIndex);
+        credentialStatusRegistry[issuerDidKey].bitmaskStatus &= ~(uint256(1) << credentialIndex);
 
         emit CredentialEnabled(issuerDidKey, credentialIndex, msg.sender, block.timestamp);
 
@@ -79,7 +77,7 @@ contract credentialStatusContract {
         require(validateCredentialStatusRegistry(issuerDidKey));
 
         // OR bitwise operation sets credential status bit to 1 (Revoked)
-        credentialStatusRegistry[issuerDidKey].bitmaskStatus |= (1 << credentialIndex);
+        credentialStatusRegistry[issuerDidKey].bitmaskStatus |= (uint256(1) << credentialIndex);
 
         emit CredentialRevoked(issuerDidKey, credentialIndex, msg.sender, block.timestamp);
 
@@ -96,7 +94,7 @@ contract credentialStatusContract {
         require(validateCredentialStatusRegistry(issuerDidKey));
 
         // AND bitwise operation returns credential status bit
-        return (credentialStatusRegistry[issuerDidKey].bitmaskStatus & (1 << credentialIndex)) == 0;
+        return (credentialStatusRegistry[issuerDidKey].bitmaskStatus & (uint256(1) << credentialIndex)) == 0;
 
     }
 
