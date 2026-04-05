@@ -1,101 +1,151 @@
 # Ethereum Corporate Access Control IAM System
 ## Description
-This project is a corporate access control system implemented in Solidity, for blockchains implementing the Ethereum Virtual Machine. 
-We implement a DID system where the existence of user identities are stored to the blockchain in simple structures, and then read and written from the off chain layer. 
+This project is a corporate access control system implemented in Solidity and Python, for blockchains based on the Ethereum Virtual Machine. 
+We implement a DID system where the existence of user identities are stored on the blockchain in simple structures. For cost-saving purposes, additional information is stored off chain. 
 We also implement a system to sign verified credentials, to be used as IAM permission tokens.
 These are also stored off chain and then verified, using the presenting user's DID and the registry's current permission status. 
-
-These actions are orchestrated by off-chain tooling, to be developed in the next steps.
-This system will be developed in standard general purpose programming languages appropriate to the use case in question.
-Specifically, we expect to develop a basic management tool in Python, and a proof of concept user app in Javascript, but implementaion details are subject to change.
-These tools will use Web3 and IPFS libraries to provide a user friendly and complete IAM system built on top of distributed and decentralized controls.
+These actions are orchestrated via the Python CLI off-chain.
+Web3 and other relevant libraries are used to provide a user-friendly and complete IAM system built on top of distributed and decentralized controls.
 
 ## Dependencies and Setup
 ### Dependencies
-As the off-chain components have yet to be developed, the dependencies for this project are currently minimal, and will expand in the future as further components are implemented.
-The current dependencies are:
-1. [Remix IDE](https://remix.live/) with a Solidity compiler matching the pinned version in the contracts to run tests. Currently this is `>=0.8.2 <0.9.0;`.
-2. An IPFS node running on the development machine. See [IPFS documentation](https://docs.ipfs.tech/install/ipfs-desktop/) The node must remain up for the duration of using the IAM system, as it cannot otherwise be guaranteed that the VC files will be available for download.
+The dependencies are:
+1. Foundry v1.6.0-rc1
+2. Kubo 0.40.1
+3. Python3 with libraries: web3, cryptography, base58, requests
 
 ### Setup
-Currently the setup of this project involves deploying the contracts on a test environment.
-1. Using [Remix IDE](https://remix.live/), clone this repository.
-2. Compile smart contract 'credential-status-contract.sol' and 'did-registry-contract.sol' in the File Explorer.
-3. In the Deploy & Run Transactions section, deploy both compiled contracts using a Remix VM environment.
-4. Interact with the different contract functions by passing arguments to the functions and observe interaction with the VM blockchain on the right side.
-5. Observe the contract functions reject invalid inputs or scenarios, while successfully processing valid arguments according to the current state.
+Currently the setup of this project involves deploying the contracts on a local test environment.
 
+1. Install the Foundry smart contract development kit.
+``` bash
+$ curl -L https://foundry.paradigm.xyz | bash
+$ source ~/.bashrc
+$ foundryup
+```
+2. Start Anvil. By default, 10 wallets are initialized. Blocks are mined instantly.
+``` bash
+$ anvil
+```
+3. Clone this repository.
+4. Initialize forge. The 'Counter' script and test file can be deleted.
+``` bash
+/cse540-team8-iam-cac$ forge init --no-git
+/cse540-team8-iam-cac$ rm script/Counter.s.sol
+/cse540-team8-iam-cac$ rm test/Counter.t.sol
+```
+5. Compile the smart contracts.
+``` bash
+/cse540-team8-iam-cac$ forge build
+```
+6. Deploy the contracts to the local blockchain. 
+``` bash
+/cse540-team8-iam-cac$ cd src/
+/cse540-team8-iam-cac/src$ forge create did-registry-contract.sol:DidRegistryContract --rpc-url http://127.0.0.1:8545 --private-key <account[0] privatekey> --broadcast
+/cse540-team8-iam-cac/src$ forge create credential-status-contract.sol:CredentialStatusContract --rpc-url http://127.0.0.1:8545 --private-key <account[0] privatekey> --broadcast
+```
+7. Download and install IPFS Kubo.
+``` bash
+$ wget https://dist.ipfs.tech/kubo/v0.40.1/kubo_v0.40.1_linux-amd64.tar.gz
+$ tar -xvzf kubo_v0.40.1_linux-amd64.tar.gz
+$ sudo kubo/install.sh
+```
+8. Initialize IPFS Kubo with localhost permissions.
+``` bash
+$ ipfs init
+$ ipfs config Addresses.API /ip4/127.0.0.1/tcp/5001
+$ ipfs config --json API.HTTPHeaders.Access-Control-Allow-Origin '["http://localhost:3000", "http://127.0.0.1:5001"]'
+$ ipfs config --json API.HTTPHeaders.Access-Control-Allow-Methods '["PUT", "POST"]'
+```
+9. Start IPFS Kubo.
+``` bash
+$ ipfs daemon
+```
+10. Initialize a Python virtual environment.
+``` bash
+$ python3 -m venv venv
+$ source venv/bin/activate
+```
+11. Install the Python libraries listed as dependencies above.
+``` bash
+(venv) $ pip3 install web3
+(venv) $ pip3 install cryptography
+(venv) $ pip3 install base58
+(venv) $ pip3 install requests
+```
+12. Run the IAM CAC CLI.
+``` bash
+(venv) /cse540-team8-iam-cac/src$ python3 iam-cac.py --help
+```
 
-## Instructions and User Stories
-Instructions for use are currently primarily illustrated using user stories. These stories represent how we intend for the end users and administrators of this system to be able to interact with the IAM system. Currently, any operations that involve bridging between IPFS and the on-chain Ethereum contract must be conducted manually.
+## User Stories
+Instructions for use are currently primarily illustrated using user stories. These stories represent how we intend for the end users and administrators of this system to be able to interact with the IAM system.
 
 ### 1. A new employee should be able to register a Decentralized Identity (DID). 
-When a new employee is onboarded, the should be able to generate and register a new Decentralized Identity (DID) on-chain and then store that DID in their personal wallet.
+When a new employee is onboarded, the user should be able to generate and register a new Decentralized Identity (DID) on-chain and then store that DID in their personal wallet.
 
-#### Handler
-``` solidity
-function addDidKey(uint employeeId, string memory holderDidKey) public {}
+``` sh
+$ python3 iam-cac.py user generatekey
+$ python3 iam-cac.py user addkey --employeeid EMPLOYEEID --employeedidkey EMPLOYEEDIDKEY --sourcewallet SOURCEWALLET
 ```
 
 ### 2. An employee should be able to update its DID.
 An employee should be able to update its DID on the blockchain.
 
-#### Handler
-``` solidity
-function updateDidKey(uint employeeId, string memory holderNewDidKey) public {}
+``` sh
+$ python3 iam-cac.py user updatekey --employeeid EMPLOYEEID --employeenewdidkey EMPLOYEENEWDIDKEY --sourcewallet SOURCEWALLET
 ```
 
-### 3. An admin should be able to add a new employee.
-An user with the `admin` role should be able to add a new employee. Minimum information required to initialize a new employee is passed as argument.
+### 3. An employee should be able to revoke its DID.
+An employee should be able to revoke its DID on the blockchain.
 
-#### Handler
-``` solidity
-function addEmployee(uint employeeId, string memory _name, string memory _email, uint _startDate, EmployeeStatus _employeeStatus) public {}
+``` sh
+$ python3 iam-cac.py user revokekey --employeeid EMPLOYEEID --sourcewallet SOURCEWALLET
 ```
 
-### 4. An admin should be able to update employee's information.
-Once an employee is added to the system, an user with 'admin' role should be able to update information, including the IPFS CID to full credential blob.
+### 4. An admin should be able to add a new employee.
+An user with the `admin` role should be able to add a new employee. Minimum information required to initialize a new employee is passed as argument. Optionally, the administrator can add employee information on-chain, passed in JSON format.
 
-#### Handler
-``` solidity
-function updateEmployeeName(uint employeeId, string memory _name) public {}
-function updateEmployeeEmail(uint employeeId, string memory _email) public {}
-function updateEmployeeIpfsCid(uint employeeId, string memory _ipfsCid) public {}
-function updateEmployeeStatus(uint employeeId, EmployeeStatus _employeeStatus) public {}
+``` sh
+$ python3 iam-cac.py admin addemployee --employeeid EMPLOYEEID [--employeeinfo EMPLOYEEINFO] --sourcewallet SOURCEWALLET
 ```
 
-### 5. An admin should be able to update an employee's permissions. 
+### 5. An admin should be able to revoke an employee.
+During employee offboarding, a user with the `admin` role should be able to revoke another user, immediately terminating their access to all internal applications.
+
+``` sh
+$ python3 iam-cac.py admin revokeemployee --employeeid EMPLOYEEID --sourcewallet SOURCEWALLET
+```
+
+### 6. An admin should be able to enable (unrevoke) an employee.
+An user with the `admin` role should be able to enable (unrevoke) an employee.
+
+``` sh
+$ python3 iam-cac.py admin enableemployee --employeeid EMPLOYEEID --sourcewallet SOURCEWALLET
+```
+
+### 7. An admin should be able to update employee's information.
+Once an employee is added to the system, an user with 'admin' role should be able to update employee information, including the IPFS CID to either the employee information blob or the employee credentials blob.
+
+``` solidity
+function updateEmployeeipfsCidInformationFile(uint employeeId, string memory ipfsCidInformationFile) public {}
+function updateEmployeeipfsCidCredentialsFile(uint employeeId, string memory ipfsCidCredentialsFile) public {}
+```
+
+### 8. An admin should be able to update an employee's permissions. 
 An user with the `admin` role should be able to update another employee's permissions by either updating the employee's roles or groups. These permissions should correspond to the internal applications that an employee is able to access. 
 
-#### Handler
-``` solidity
-function addRole(uint employeeId, string memory _role) public {}
-function removeRole(uint employeeId, string memory _role) public {}
+``` sh
+$ python3 iam-cac.py admin <WORK IN PROGRESS>
 ```
 
-### 6. An admin should be able to add a new contractor.
-An user with the `admin` role should be able to add a new contractor. Minimum information required to initialize a new contractor is passed as argument.
-
-#### Handler
-``` solidity
-function addContractor(uint employeeId, string memory _name, string memory _email, uint _startDate, string memory _agency) public {}
-```
-
- ### 7. An admin should be able to update contractor's information.
-Once a contractor is added to the system, an user with 'admin' role should be able to update information, including the IPFS CID to full credential blob.
-
-#### Handler
-``` solidity
-function updateContractorName(uint employeeId, string memory _name) public {}
-function updateContractorEmail(uint employeeId, string memory _email) public {}
-function updateContractorIpfsCid(uint employeeId, string memory _ipfsCid) public {}
-function updateContractorAgency(uint employeeId, string memory _ipfsCid) public {}
-```
-
-### 8. An employee should be granted access to login into an internal system by the Issuer.
+### 9. An employee should be granted access to login into an internal system by the Issuer.
 If the employee has been given permission to access an internal system, the corresponding Issuer enables the user's credential status.
 
-#### Handler
+``` bash
+$ python3 iam-cac.py issuer <WORK IN PROGRESS>
+```
+
 ``` solidity
 /*
 Credential status
@@ -105,18 +155,24 @@ Credential status
 function enableCredential(string memory issuerDidKey, uint256 credentialIndex) public {}
 ```
 
-### 9. A system's Issuer should be able to revoke access to a user.
+### 10. A system's Issuer should be able to revoke access to a user.
 If the employee's permission to access an internal system is disabled, the corresponding Issuer revokes the user's credential status.
 
-#### Handler
+``` sh
+$ python3 iam-cac.py issuer <WORK IN PROGRESS>
+```
+
 ``` solidity
 function revokeCredential(string memory issuerDidKey, uint256 credentialIndex) public {}
 ```
 
-### 10. An employee with proper access should be able to login to an internal system. 
+### 11. An employee with proper access should be able to login to an internal system. 
 When an employee logs into an internal application, the Verifier checks the credential status on the IAM-CAC blockchain.
 
-#### Handler
+``` sh
+$ python3 iam-cac.py verifier <WORK IN PROGRESS>
+```
+
 ``` solidity
 /*
 Returns
@@ -124,28 +180,4 @@ TRUE  == Credential status bit is 0. Credential is valid.
 FALSE == Credential status bit is 1. Credential is revoked.
 */
 function isCredentialValid(string memory issuerDidKey, uint256 credentialIndex) public view returns (bool) {}
-```
-
-### 11. An admin only should be able to revoke an employee in the Employee Registry.
-During employee offboarding, a user with the `admin` role should be able to revoke another user, immediately terminating their access to all internal applications. 
-
-#### Handler
-``` solidity
-function revokeEmployee(uint employeeId, uint _endDate) public {}
-```
-
-### 12. An admin only should be able to revoke an employee in the Employee Registry.
-During contractor offboarding, a user with the `admin` role should be able to revoke a contractor, immediately terminating their access to all internal applications. 
-
-#### Handler
-``` solidity
-function revokeContractor(uint employeeId, uint _endDate) public {}
-```
-
-### 13. An admin only should be able to revoke an employee's Decentralized Identity.
-During the employee offboarding process, a user with the `admin` role should be able to revoke another employee's DID from the DidRegistry. 
-
-#### Handler
-``` solidity
-function revokeDidKey(uint employeeId) public {}
 ```
