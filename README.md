@@ -104,7 +104,7 @@ $ python3 iam-cac.py user revokekey --employeeid EMPLOYEEID --sourcewallet SOURC
 ```
 
 ### 4. An admin should be able to add a new employee.
-An user with the `admin` role should be able to add a new employee. Minimum information required to initialize a new employee is passed as argument. Optionally, the administrator can add employee information on-chain, passed in JSON format.
+An user with the `admin` role should be able to add a new employee. Minimum information required to initialize a new employee is passed as argument. Optionally, the administrator can add employee information off-chain, passed in JSON format.
 
 ``` sh
 $ python3 iam-cac.py admin addemployee --employeeid EMPLOYEEID [--employeeinfo EMPLOYEEINFO] --sourcewallet SOURCEWALLET
